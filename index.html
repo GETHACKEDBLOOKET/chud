@@ -3,260 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Source Web Desktop</title>
+    <title>Google Docs</title>
+    <!-- Imports a clean sans-serif font family -->
+    <link href="https://googleapis.com" rel="stylesheet">
     <style>
-        /* Base Setup */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
+        * { box-sizing: border-box; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; overflow: hidden; 
+            background: linear-gradient(to bottom, #140526 0%, #010114 100%);
+            font-family: 'Product Sans', 'Google Sans', system-ui, sans-serif;
+            display: flex; flex-direction: column;
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        /* Synthwave Navbar Custom Styles */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background-color: #0d021a; padding: 12px 20px;
+            border-bottom: 3px solid #ff007f; box-shadow: 0px 0px 15px #ff007f; z-index: 10;
         }
 
-        /* Desktop Background (Starry Anime Vibe) */
-        .desktop {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, #1a2a6c, #275d8c, #6998bf);
-            background-size: cover;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .title {
+            color: #00ffff; font-weight: 700; font-size: 1.4rem;
+            text-transform: uppercase; letter-spacing: 2px;
+            text-shadow: 0 0 10px #00ffff;
         }
 
-        /* Central Clock Widget */
-        .clock-widget {
-            margin-top: 40px;
-            color: rgba(255, 255, 255, 0.8);
-            text-align: center;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        .nav-buttons { display: flex; gap: 10px; }
+
+        .btn {
+            background: transparent; border: 2px solid #ff007f; color: #ff007f;
+            padding: 8px 16px; font-family: inherit; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; border-radius: 4px; text-transform: uppercase;
+            transition: all 0.3s ease; box-shadow: 0 0 5px #ff007f;
         }
 
-        .clock-widget h1 {
-            font-size: 3.5rem;
-            font-weight: 300;
+        .btn:hover, .btn.active {
+            background-color: #ff007f; color: #fff;
+            box-shadow: 0 0 15px #ff007f, 0 0 25px #ff007f;
         }
 
-        .clock-widget p {
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+        .btn.search-btn { border-color: #00ffff; color: #00ffff; box-shadow: 0 0 5px #00ffff; }
+        .btn.search-btn:hover { background-color: #00ffff; color: #000; box-shadow: 0 0 15px #00ffff; }
 
-        /* Floating, Translucent Centered Dock */
-        .taskbar-dock {
-            position: absolute;
-            bottom: 20px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            gap: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .dock-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 0.8rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .dock-icon:hover {
-            transform: scale(1.15) translateY(-5px);
-            background: rgba(255, 255, 255, 0.4);
-        }
-
-        /* Draggable Window Structure */
-        .window {
-            position: absolute;
-            top: 250px;
-            left: 100px;
-            width: 450px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-            border: 1px solid rgba(255,255,255,0.4);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 10;
-        }
-
-        /* Window Titlebar (The handle for dragging) */
-        .titlebar {
-            height: 35px;
-            background: rgba(0, 0, 0, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 12px;
-            cursor: move;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .window-title {
-            font-size: 0.9rem;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .window-controls {
-            display: flex;
-            gap: 8px;
-        }
-
-        .control-btn {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-close { background-color: #ff5f56; }
-        .btn-minimize { background-color: #ffbd2e; }
-        .btn-maximize { background-color: #27c93f; }
-
-        /* Window Content Area */
-        .window-content {
-            padding: 15px;
-            flex: 1;
-            overflow-auto: auto;
-            color: #222;
-            font-size: 0.95rem;
-            background: white;
-        }
+        .container { flex-grow: 1; width: 100%; height: 100%; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; background: transparent; }
     </style>
 </head>
 <body>
 
-    <div class="desktop">
-        
-        <!-- Live Clock Widget -->
-        <div class="clock-widget">
-            <h1 id="clock-time">00:00 PM</h1>
-            <p id="clock-date">Wednesday, September 30</p>
+    <div class="navbar">
+        <div class="title">Dashboard</div>
+        <div class="nav-buttons">
+            <!-- These links use the proxy prefix syntax to cleanly process the traffic -->
+            <button class="btn search-btn" onclick="loadSite('https://www.google.com')">Google</button>
+            <button class="btn" onclick="loadSite('https://roblox.com')">Roblox</button>
+            <button class="btn" onclick="loadSite('https://www.tiktok.com')">TikTok</button>
         </div>
+    </div>
 
-        <!-- Sample Dynamic Application Window -->
-        <div class="window" id="myWindow">
-            <div class="titlebar" id="myWindowHeader">
-                <span class="window-title">System Terminal</span>
-                <div class="window-controls">
-                    <button class="control-btn btn-close" onclick="closeWindow()"></button>
-                    <button class="control-btn btn-minimize"></button>
-                    <button class="control-btn btn-maximize"></button>
-                </div>
-            </div>
-            <div class="window-content">
-                <p style="font-family: monospace; color: #155724;">user@serumos_sandbox:~\$ echo "Welcome to the open-source web desktop environment template."</p>
-            </div>
-        </div>
-
-        <!-- Bottom Application Dock -->
-        <div class="taskbar-dock">
-            <div class="dock-icon" onclick="openWindow()">Term</div>
-            <div class="dock-icon">Files</div>
-            <div class="dock-icon">Code</div>
-            <div class="dock-icon">Web</div>
-            <div class="dock-icon">Set</div>
-        </div>
-
+    <div class="container">
+        <!-- Defaults to the main proxy interface screen -->
+        <iframe id="proxy-frame" src="https://rublconxray.com"></iframe>
     </div>
 
     <script>
-        // JavaScript for the Clock Functionality
-        function updateClock() {
-            const now = new Date();
-            let hours = now.getHours();
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12; // Handle 0 as 12
-            
-            document.getElementById('clock-time').textContent = `${hours}:${minutes} ${ampm}`;
-            
-            const options = { weekday: 'long', month: 'long', day: 'numeric' };
-            document.getElementById('clock-date').textContent = now.toLocaleDateString('en-US', options);
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        // Adjust this if your current proxy link changes or gets blocked
+        const PROXY_BASE = "https://rublconxray.commain/"; 
 
-        // Window Control Functions
-        function closeWindow() {
-            document.getElementById('myWindow').style.display = 'none';
-        }
-        function openWindow() {
-            document.getElementById('myWindow').style.display = 'flex';
-        }
-
-        // JavaScript for Draggable Window functionality
-        dragElement(document.getElementById("myWindow"));
-
-        function dragElement(elmnt) {
-            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            if (document.getElementById(elmnt.id + "Header")) {
-                // if present, the header is where you move the DIV from:
-                document.getElementById(elmnt.id + "Header").onmousedown = dragMouseDown;
-            } else {
-                // otherwise, move the DIV from anywhere inside the DIV:
-                elmnt.onmousedown = dragMouseDown;
-            }
-
-            function dragMouseDown(e) {
-                e = e || window.event;
-                e.preventDefault();
-                // get the mouse cursor position at startup:
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                // call a function whenever the cursor moves:
-                document.onmousemove = elementDrag;
-            }
-
-            function elementDrag(e) {
-                e = e || window.event;
-                e.preventDefault();
-                // calculate the new cursor position:
-                pos1 = pos3 - e.clientX;
-                pos2 = pos4 - e.clientY;
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                // set the element's new position:
-                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-            }
-
-            function closeDragElement() {
-                // stop moving when mouse button is released:
-                document.onmouseup = null;
-                document.onmousemove = null;
-            }
+        function loadSite(targetUrl) {
+            const frame = document.getElementById('proxy-frame');
+            // Formats the URL through the proxy's internal routing engine
+            frame.src = PROXY_BASE + btoa(targetUrl); 
         }
     </script>
 </body>
