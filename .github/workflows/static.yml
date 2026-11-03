@@ -1,44 +1,81 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Docs</title>
+    <!-- Imports a clean sans-serif font family -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; overflow: hidden; 
+            background: linear-gradient(to bottom, #140526 0%, #010114 100%);
+            font-family: 'Product Sans', 'Google Sans', system-ui, sans-serif;
+            display: flex; flex-direction: column;
+        }
 
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+        /* Synthwave Navbar Custom Styles */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background-color: #0d021a; padding: 12px 20px;
+            border-bottom: 3px solid #ff007f; box-shadow: 0px 0px 15px #ff007f; z-index: 10;
+        }
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+        .title {
+            color: #00ffff; font-weight: 700; font-size: 1.4rem;
+            text-transform: uppercase; letter-spacing: 2px;
+            text-shadow: 0 0 10px #00ffff;
+        }
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+        .nav-buttons { display: flex; gap: 10px; }
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+        .btn {
+            background: transparent; border: 2px solid #ff007f; color: #ff007f;
+            padding: 8px 16px; font-family: inherit; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; border-radius: 4px; text-transform: uppercase;
+            transition: all 0.3s ease; box-shadow: 0 0 5px #ff007f;
+        }
 
-jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
-https://s3.amazonaws.com/scholarnook/index.html
+        .btn:hover, .btn.active {
+            background-color: #ff007f; color: #fff;
+            box-shadow: 0 0 15px #ff007f, 0 0 25px #ff007f;
+        }
+
+        .btn.search-btn { border-color: #00ffff; color: #00ffff; box-shadow: 0 0 5px #00ffff; }
+        .btn.search-btn:hover { background-color: #00ffff; color: #000; box-shadow: 0 0 15px #00ffff; }
+
+        .container { flex-grow: 1; width: 100%; height: 100%; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; background: transparent; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="title">Dashboard</div>
+        <div class="nav-buttons">
+            <!-- These links use the proxy prefix syntax to cleanly process the traffic -->
+            <button class="btn search-btn" onclick="loadSite('https://www.google.com')">Google</button>
+            <button class="btn" onclick="loadSite('https://roblox.com')">Roblox</button>
+            <button class="btn" onclick="loadSite('https://www.tiktok.com')">TikTok</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Defaults to the main proxy interface screen -->
+        <iframe id="proxy-frame" src="https://rublconxray.com"></iframe>
+    </div>
+
+    <script>
+        // Adjust this if your current proxy link changes or gets blocked
+        const PROXY_BASE = "https://rublconxray.commain/"; 
+
+        function loadSite(targetUrl) {
+            const frame = document.getElementById('proxy-frame');
+            // Formats the URL through the proxy's internal routing engine
+            frame.src = PROXY_BASE + btoa(targetUrl); 
+        }
+    </script>
+</body>
+</html>
+
